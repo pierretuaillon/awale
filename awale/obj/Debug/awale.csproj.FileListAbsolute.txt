@@ -1,0 +1,15 @@
+D:\Projet net\awale\awale\bin\Debug\awale.exe.config
+D:\Projet net\awale\awale\bin\Debug\awale.exe
+D:\Projet net\awale\awale\bin\Debug\awale.pdb
+D:\Projet net\awale\awale\obj\Debug\awale.csprojResolveAssemblyReference.cache
+D:\Projet net\awale\awale\obj\Debug\MainWindow.g.cs
+D:\Projet net\awale\awale\obj\Debug\App.g.cs
+D:\Projet net\awale\awale\obj\Debug\awale_MarkupCompile.cache
+D:\Projet net\awale\awale\obj\Debug\awale_MarkupCompile.lref
+D:\Projet net\awale\awale\obj\Debug\MainWindow.baml
+D:\Projet net\awale\awale\obj\Debug\awale.g.resources
+D:\Projet net\awale\awale\obj\Debug\awale.Properties.Resources.resources
+D:\Projet net\awale\awale\obj\Debug\awale.csproj.GenerateResource.Cache
+D:\Projet net\awale\awale\obj\Debug\awale.csproj.CoreCompileInputs.cache
+D:\Projet net\awale\awale\obj\Debug\awale.exe
+D:\Projet net\awale\awale\obj\Debug\awale.pdb
