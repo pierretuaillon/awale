@@ -7,20 +7,40 @@
         mc:Ignorable="d"
         Title="AWALE" Height="350" Width="525">
     <Grid>
-        <Image Source="C:\Users\Pierre\Desktop\awale.png" HorizontalAlignment="Left" Height="59" Margin="123,78,0,0" VerticalAlignment="Top" Width="301"/>
-        <Image Source="C:\Users\Pierre\Desktop\awale.png" HorizontalAlignment="Left" Height="59" Margin="123,142,0,0" VerticalAlignment="Top" Width="299"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="152,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="196,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="237,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="279,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="322,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="364,156,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="152,92,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="196,92,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="237,92,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="279,92,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="322,92,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-        <TextBox HorizontalAlignment="Left" Height="24" Margin="364,92,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="30" Opacity="0"/>
-
+        <DockPanel>
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Partie">
+                    <MenuItem Header="2 joueurs local" Click="joueursLocal" />
+                    <MenuItem Header="2 joueurs online" Click="MenuItem_Click" />
+                    <MenuItem Header="VS IA" Click="joueurIA" />
+                    <Separator />
+                    <MenuItem Header="_Exit" />
+                </MenuItem>
+                <MenuItem Header="_Historiques">
+                    <MenuItem Header="Toutes les parties" />
+                    Header="Parties gagnées" />
+                    <MenuItem Header="Parties perdus" />
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding Path=joueur2.nom, Mode=TwoWay}" Width="242" Margin="0,33,123,265" TextAlignment="Center" Foreground="Aquamarine" Name="J2"/>
+        <Image Source="/image/awale.png" HorizontalAlignment="Left" Height="59" Margin="123,78,0,0" VerticalAlignment="Top" Width="300" Name="plateauJ2"/>
+        <Image Source="/image/awale.png" HorizontalAlignment="Left" Height="59" Margin="123,142,0,0" VerticalAlignment="Top" Width="300" Name="plateauJ1"/>
+        <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding Path=joueur1.nom, Mode=TwoWay}" Width="242" Margin="0,219,123,79" TextAlignment="Center" Foreground="Chocolate" Name="J1"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="152,160,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[0].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="A" TextAlignment="Center" Foreground="Chocolate"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="196,160,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[1].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="B" TextAlignment="Center" Foreground="Chocolate"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="237,160,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[2].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="C" TextAlignment="Center" Foreground="Chocolate"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="279,160,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[3].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="D" TextAlignment="Center" Foreground="Chocolate"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="322,160,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[4].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="E" TextAlignment="Center" Foreground="Chocolate"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="364,160,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[5].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="F" TextAlignment="Center" Foreground="Chocolate"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="152,94,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[11].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="f" TextAlignment="Center" Foreground="Aquamarine"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="196,94,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[10].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="e" TextAlignment="Center" Foreground="Aquamarine"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="237,94,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[9].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="d" TextAlignment="Center" Foreground="Aquamarine"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="279,94,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[8].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="c" TextAlignment="Center" Foreground="Aquamarine"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="322,94,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[7].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="b" TextAlignment="Center" Foreground="Aquamarine"/>
+        <TextBox BorderThickness="0" IsReadOnly="True" HorizontalAlignment="Left" Height="24" Margin="364,94,0,0" TextWrapping="Wrap" Text="{Binding Path=trous[6].nombreGraines, Mode=TwoWay}" VerticalAlignment="Top" Width="30" Opacity="100" Background="Transparent" MouseDoubleClick="TextBox_MouseDoubleClick" Name="a" TextAlignment="Center" Foreground="Aquamarine"/>
+        <Label Height="44" Margin="152,254,123,21" Foreground="DarkMagenta">
+            <TextBlock  Name="labelInformation" Text="Some very long text that will wrap since the width of this label is only 100." TextWrapping="WrapWithOverflow"/>
+        </Label>
     </Grid>
 </Window>
