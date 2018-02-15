@@ -10,12 +10,23 @@ namespace awale
 
     class MoteurDeJeu
     {
+        private int nombreGrainesTotalBase;
         public string typeDepartie { get; set; }
         public Personne currentJoueur;
         public ObservableCollection<Trou> trous { get; set; }
         public MoteurDeJeu(ObservableCollection<Trou> trous)
         {
             this.trous = trous;
+
+            int nbGrainesEnJeu = 0;
+
+            foreach (var trou in this.trous)
+            {
+                nbGrainesEnJeu += trou.nombreGraines;
+            }
+            nombreGrainesTotalBase = nbGrainesEnJeu;
+
+            System.Console.WriteLine(nombreGrainesTotalBase);
         }
 
         public void faireAction (Trou trouDepart)
@@ -52,6 +63,8 @@ namespace awale
                     graineEnMain--;
                 }
             }
+
+            getGraines(currentTrou);
         }
         
         //Mis a jour du nombre de graines dans un trou
@@ -69,6 +82,36 @@ namespace awale
             }
         }
 
+        public void getGraines(Trou trouATest)
+        {
+            while(trouATest.nombreGraines == 2 || trouATest.nombreGraines == 3)
+            {
+                this.currentJoueur.score += trouATest.nombreGraines;
+                trouATest.nombreGraines = 0;
+                updateElementList(trouATest);
+                //On test le trou d'avant
+                trouATest = trouATest.predecesseur;
+            }
+        }
+
+        public Boolean finPartie()
+        {
+            int nbGrainesEnJeu = 0;
+
+            foreach (var trou in this.trous)
+            {
+                nbGrainesEnJeu += trou.nombreGraines;
+            }
+
+            if(this.nombreGrainesTotalBase / 2 > nbGrainesEnJeu)
+            {
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
         public Boolean actionPossible(Trou trouAtester)
         {
             for (int i = 0; i < this.currentJoueur.listTrouPerso.Count; i++)
@@ -83,7 +126,6 @@ namespace awale
             //Si on arrive ici c'est que l'utilisateur ne possede pas le trou
             //il ne peut donc pas jouer
             return false;
-
         }
     }
 }

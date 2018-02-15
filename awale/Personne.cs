@@ -9,9 +9,23 @@ namespace awale
 {
     public class Personne : INotifyPropertyChanged
     {
-        public int score { get; set; }
+        private int _score { get; set; }
         private string _nom;
         public List<Trou> listTrouPerso { get; set; }
+
+        public int score
+        {
+            get
+            {
+                return _score;
+            }
+            set
+            {
+                _score = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("score"));
+            }
+        }
 
         public string nom
         {
@@ -33,6 +47,7 @@ namespace awale
         {
             this._nom = nom;
             this.listTrouPerso = new List<Trou>();
+            this.score = 0;
         }
 
 

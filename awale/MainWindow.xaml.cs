@@ -138,26 +138,44 @@ namespace awale
                 }
             }
 
-            if (this.moteur.actionPossible(elementRecherche))
+            if (this.moteur.finPartie())
             {
-                this.moteur.faireAction(elementRecherche);
 
-                //Si le joueur courrant est le joueur 1
-                if(this.moteur.currentJoueur.nom == this.joueur1.nom)
+                labelInformation.Text = "Fin de la partie ";
+                if(this.joueur1.score > this.joueur2.score)
                 {
-                    this.moteur.currentJoueur = this.joueur2;
+                    labelInformation.Text += "\n Le joueur : " + this.joueur1.nom + " gagne !";
                 }
-                //Sinon c'est forcement le joueur 2
                 else
                 {
-                    this.moteur.currentJoueur = this.joueur1;
+                    labelInformation.Text += "\n Le joueur : " + this.joueur2.nom + " gagne !";
                 }
-                labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
             }
             else
             {
-                labelInformation.Text = "Vous ne pouvez utiliser les graines de l'adversaire ! ";
+                if (this.moteur.actionPossible(elementRecherche))
+                {
+                    this.moteur.faireAction(elementRecherche);
+
+                    //Si le joueur courrant est le joueur 1
+                    if (this.moteur.currentJoueur.nom == this.joueur1.nom)
+                    {
+                        this.moteur.currentJoueur = this.joueur2;
+                    }
+                    //Sinon c'est forcement le joueur 2
+                    else
+                    {
+                        this.moteur.currentJoueur = this.joueur1;
+                    }
+                    labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
+                }
+                else
+                {
+                    labelInformation.Text = "Vous ne pouvez utiliser les graines de l'adversaire ! ";
+                }
             }
+
+            
                         
 
             System.Console.WriteLine("/**** MISE A JOUR DE LA VUE ****/");
@@ -198,6 +216,8 @@ namespace awale
             plateauJ2.Visibility = Visibility.Hidden;
             J1.Visibility = Visibility.Hidden;
             J2.Visibility = Visibility.Hidden;
+            score1.Visibility = Visibility.Hidden;
+            score2.Visibility = Visibility.Hidden;
         }
         
         public void rendreVisible()
@@ -221,6 +241,8 @@ namespace awale
             plateauJ2.Visibility = Visibility.Visible;
             J1.Visibility = Visibility.Visible;
             J2.Visibility = Visibility.Visible;
+            score1.Visibility = Visibility.Visible;
+            score2.Visibility = Visibility.Visible;
         }
 
         public void joueursLocal(object sender, RoutedEventArgs e)
