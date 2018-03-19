@@ -9,10 +9,10 @@ namespace awale
     class Partie
     {
 
-        public Personne joueur1 { get; }
-        public Personne joueur2 { get; }
+        public Personne joueur1 { get; set; }
+        public Personne joueur2 { get; set; }
 
-        public Partie(Personne joueur1, Personne joueur2)
+        public Partie (Personne joueur1, Personne joueur2)
         {
             this.joueur1 = joueur1;
             this.joueur2 = joueur2;

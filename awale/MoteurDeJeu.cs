@@ -12,7 +12,7 @@ namespace awale
     {
         private int nombreGrainesTotalBase;
         public string typeDepartie { get; set; }
-        public Personne currentJoueur;
+        public Personne currentJoueur { get; set; }
         public ObservableCollection<Trou> trous { get; set; }
         public MoteurDeJeu(ObservableCollection<Trou> trous)
         {
@@ -65,7 +65,7 @@ namespace awale
                 }
             }
 
-            getGraines(currentTrou);
+            getGraines(currentTrou.predecesseur);
         }
 
         //Mis a jour du nombre de graines dans un trou
@@ -95,24 +95,6 @@ namespace awale
             }
         }
 
-        public Boolean finPartie()
-        {
-            int nbGrainesEnJeu = 0;
-
-            foreach (var trou in this.trous)
-            {
-                nbGrainesEnJeu += trou.nombreGraines;
-            }
-
-            if (this.nombreGrainesTotalBase / 2 > nbGrainesEnJeu)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
         public Boolean actionPossible(Trou trouAtester)
         {
@@ -136,32 +118,40 @@ namespace awale
 
             //On sauvegarde l'etat avant les modifications de l'IA
             //pour pouvoir remettre en état aprés chaque test
-            ObservableCollection<Trou> saveTrous = this.trous;
-            Personne current = this.currentJoueur;
-            //Tchatcheur ;)
+            //ObservableCollection<Trou> saveTrous = new ObservableCollection<Trou>(this.trous);
+            //Personne current = new Personne(this.currentJoueur);
             Trou bestTrou = null;
-            int bestScore = this.currentJoueur.score;
+            //int bestScore = this.currentJoueur.score;
 
             //On mise en priorité le score
             foreach (var trou in this.currentJoueur.listTrouPerso)
             {
                 if(trou.nombreGraines > 0)
                 {
-                    faireAction(trou);
+                    //faireAction(trou);
                     if (bestTrou == null)
                     {
                         bestTrou = trou;
+                        //bestScore = this.currentJoueur.score;
                     }
                     else
                     {
                         //Si on gagne le plus de points depuis se trou on le joue
-                        if (bestScore < this.currentJoueur.score)
+                        //if (bestScore < this.currentJoueur.score)
+                        Trou troufinal = trou;
+                        int nb = trou.nombreGraines;
+                        while (nb > 0) {
+                            troufinal = troufinal.successeur;
+                            nb--;
+                        }
+                        if(troufinal.nombreGraines==2 || troufinal.nombreGraines==3)
                         {
                             bestTrou = trou;
+                            //bestScore = this.currentJoueur.score;
                         }
                     }
-                    this.trous = saveTrous;
-                    this.currentJoueur = current;
+                    //this.trous = new ObservableCollection<Trou>(saveTrous);
+                    //this.currentJoueur = new Personne(current);
                 }
             }
             return bestTrou;

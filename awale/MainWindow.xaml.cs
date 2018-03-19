@@ -146,47 +146,29 @@ namespace awale
                 }
             }
 
-            if (this.moteur.finPartie())
+            
+            if (this.moteur.actionPossible(elementRecherche))
             {
-
-                labelInformation.Text = "Fin de la partie ";
-                if(this.joueur1.score > this.joueur2.score)
+                if (elementRecherche.nombreGraines > 0)
                 {
-                    labelInformation.Text += "\n Le joueur : " + this.joueur1.nom + " gagne !";
+                    this.moteur.faireAction(elementRecherche);
+
+                    //On modifie le joueur courant
+                    updateCurrentJoueur();
+
+                    labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
                 }
                 else
                 {
-                    labelInformation.Text += "\n Le joueur : " + this.joueur2.nom + " gagne !";
+                    labelInformation.Text = "Vous ne pouvez pas jouer une case vide";
                 }
-                this.historique.enregistrerInfos(this.joueur1, this.joueur2);
+                    
             }
             else
             {
-                if (this.moteur.actionPossible(elementRecherche))
-                {
-                    if (elementRecherche.nombreGraines > 0)
-                    {
-                        this.moteur.faireAction(elementRecherche);
-
-                        //On modifie le joueur courant
-                        updateCurrentJoueur();
-
-                        labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
-                    }
-                    else
-                    {
-                        labelInformation.Text = "Vous ne pouvez pas jouer une case vide";
-                    }
-                    
-                }
-                else
-                {
-                    labelInformation.Text = "Vous ne pouvez utiliser les graines de l'adversaire ! ";
-                }
+                labelInformation.Text = "Vous ne pouvez utiliser les graines de l'adversaire ! ";
             }
-
-            
-                        
+                
 
             System.Console.WriteLine("/**** MISE A JOUR DE LA VUE ****/");
             this.trous = this.moteur.trous;
@@ -196,6 +178,48 @@ namespace awale
             {
                 System.Console.WriteLine(trou.nombreGraines);
             }
+
+            if (finPartie())
+            {
+                labelInformation.Text = "Fin de la partie ";
+                if (this.joueur1.score > this.joueur2.score)
+                {
+                    labelInformation.Text += "\n Le joueur : " + this.joueur1.nom + " gagne !";
+                }
+                else
+                {
+                    labelInformation.Text += "\n Le joueur : " + this.joueur2.nom + " gagne !";
+                }
+                this.historique.enregistrerInfos(this.joueur1, this.joueur2);
+            }
+        }
+
+        public Boolean finPartie()
+        {
+            if (joueur1.score >= 25)
+                return true;
+            if (joueur2.score >= 25)
+                return true;
+            if (joueur1.totalGraines() == 0)
+                return true;
+            if (joueur2.totalGraines() == 0)
+                return true;
+            return false;
+            /*int nbGrainesEnJeu = 0;
+
+            foreach (var trou in this.trous)
+            {
+                nbGrainesEnJeu += trou.nombreGraines;
+            }
+
+            if (24 > nbGrainesEnJeu)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }*/
         }
 
         private void MenuItem_Click(object sender, RoutedEventArgs e)
@@ -285,19 +309,24 @@ namespace awale
             //Si le joueur courrant est le joueur 1
             if (this.moteur.currentJoueur.nom == this.joueur1.nom)
             {
+                //this.joueur1.score = this.moteur.currentJoueur.score;
+                PropertyChanged(this, new PropertyChangedEventArgs("joueur1"));
                 this.moteur.currentJoueur = this.joueur2;
             }
             //Sinon c'est forcement le joueur 2
             else
             {
+                //this.joueur2.score = this.moteur.currentJoueur.score;
+                PropertyChanged(this, new PropertyChangedEventArgs("joueur2"));
                 this.moteur.currentJoueur = this.joueur1;
             }
-
+            //Si c'est ensuite au tour du joueur 2 en vs ia
             if(this.moteur.typeDepartie == "IA" && this.joueur2.nom == this.moteur.currentJoueur.nom)
             {
                 Trou bestChoix = this.moteur.meilleureActionIA();
                 this.moteur.faireAction(bestChoix);
-                updateCurrentJoueur();
+                PropertyChanged(this, new PropertyChangedEventArgs("joueur2"));
+                this.moteur.currentJoueur = this.joueur1;
             }
         }
 

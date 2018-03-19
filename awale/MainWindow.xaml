@@ -27,7 +27,7 @@
             </Menu>
         </DockPanel>
         <TextBlock HorizontalAlignment="Right" TextWrapping="Wrap" Text="{Binding Path=joueur2.nom, Mode=TwoWay}" Width="242" Margin="0,33,123,265" TextAlignment="Center" Foreground="Aquamarine" Name="J2"/>
-        <Label Content="{Binding Path=joueur2.score, Mode=TwoWay}" Foreground="Aquamarine" Margin="441,94,10,182" Name="score2"/>
+        <Label Content="{Binding Path=joueur2.score, Mode=TwoWay}" Foreground="Green" Margin="441,94,10,182" Name="score2"/>
         <Image Source="/image/awale.png" HorizontalAlignment="Left" Height="59" Margin="123,78,0,0" VerticalAlignment="Top" Width="300" Name="plateauJ2"/>
         <Image Source="/image/awale.png" HorizontalAlignment="Left" Height="59" Margin="123,142,0,0" VerticalAlignment="Top" Width="300" Name="plateauJ1"/>
         <Label Content="{Binding Path=joueur1.score, Mode=TwoWay}" Foreground="Chocolate" Margin="441,166,10,118" Name="score1"/>
