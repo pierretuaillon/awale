@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace awale
 {
@@ -21,19 +22,40 @@ namespace awale
     /// </summary>
     /// 
 
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
 
+        public Historique historique { get; set; }
 
-        public ObservableCollection<Trou> trous { get; set;}
+        private ObservableCollection<Trou> _trous;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ObservableCollection<Trou> trous
+        {
+            get
+            {
+                return _trous;
+            }
+            set
+            {
+                _trous = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("trous"));
+            }
+        }
+
+        
+           
         public Personne joueur1 { get; set; }
         public Personne joueur2 { get; set; }
 
         MoteurDeJeu moteur { get; set; }
         public MainWindow()
         {
+            this.historique = new Historique("./res.csv");
             initializeList();
-            InitializeComponent();
+            InitializeComponent();      
             this.DataContext = this;
             rendreInvisible();
         }
@@ -106,20 +128,6 @@ namespace awale
                 this.joueur2.listTrouPerso.Add(this.trous.ElementAt(i));
             }
 
-            /*
-            foreach (var trou in this.joueur1.listTrouPerso)
-            {
-                System.Console.WriteLine("J1 : " + trou.nom);
-            }
-
-            foreach (var trou in this.joueur2.listTrouPerso)
-            {
-                System.Console.WriteLine("J2 : " + trou.nom);
-            }
-            */
-            //Normalement les joueurs ont le même nombre de trous sinon t'es pas serein
-            System.Console.WriteLine("Le joueur 1 possede " + this.joueur1.listTrouPerso.Count + " trous");
-            System.Console.WriteLine("Le joueur 2 possede " + this.joueur2.listTrouPerso.Count + " trous");
             this.moteur = new MoteurDeJeu(this.trous);
             this.moteur.currentJoueur = joueur1;
         }
@@ -150,24 +158,26 @@ namespace awale
                 {
                     labelInformation.Text += "\n Le joueur : " + this.joueur2.nom + " gagne !";
                 }
+                this.historique.enregistrerInfos(this.joueur1, this.joueur2);
             }
             else
             {
                 if (this.moteur.actionPossible(elementRecherche))
                 {
-                    this.moteur.faireAction(elementRecherche);
-
-                    //Si le joueur courrant est le joueur 1
-                    if (this.moteur.currentJoueur.nom == this.joueur1.nom)
+                    if (elementRecherche.nombreGraines > 0)
                     {
-                        this.moteur.currentJoueur = this.joueur2;
+                        this.moteur.faireAction(elementRecherche);
+
+                        //On modifie le joueur courant
+                        updateCurrentJoueur();
+
+                        labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
                     }
-                    //Sinon c'est forcement le joueur 2
                     else
                     {
-                        this.moteur.currentJoueur = this.joueur1;
+                        labelInformation.Text = "Vous ne pouvez pas jouer une case vide";
                     }
-                    labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
+                    
                 }
                 else
                 {
@@ -249,15 +259,51 @@ namespace awale
         {
             System.Console.WriteLine("/**** Click sur 2 joueurs local ****/");
             rendreVisible();
+            initializeList();
             this.moteur.typeDepartie = "local";
             labelInformation.Text = this.moteur.currentJoueur.nom + " commence";
         }
 
-        public void joueurIA(object sender, RoutedEventArgs e)
+        public void joueurIA(object sender, RoutedEventArgs eventarg)
         {
             System.Console.WriteLine("/**** Click sur joueur IA ****/");
             rendreVisible();
+            initializeList();
             this.moteur.typeDepartie = "IA";
+            labelInformation.Text = this.moteur.currentJoueur.nom + " commence";
+            a.IsEnabled = false;
+            b.IsEnabled = false;
+            c.IsEnabled = false;
+            d.IsEnabled = false;
+            e.IsEnabled = false;
+            f.IsEnabled = false;
+        }
+
+        private void updateCurrentJoueur()
+        {
+            System.Console.WriteLine("/**** Mise à jour du joueur courant ****/");
+            //Si le joueur courrant est le joueur 1
+            if (this.moteur.currentJoueur.nom == this.joueur1.nom)
+            {
+                this.moteur.currentJoueur = this.joueur2;
+            }
+            //Sinon c'est forcement le joueur 2
+            else
+            {
+                this.moteur.currentJoueur = this.joueur1;
+            }
+
+            if(this.moteur.typeDepartie == "IA" && this.joueur2.nom == this.moteur.currentJoueur.nom)
+            {
+                Trou bestChoix = this.moteur.meilleureActionIA();
+                this.moteur.faireAction(bestChoix);
+                updateCurrentJoueur();
+            }
+        }
+
+        private void AllPartie(object sender, RoutedEventArgs e)
+        {
+            this.Content = new Page1();
         }
     }
 }

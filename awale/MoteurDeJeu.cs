@@ -29,8 +29,9 @@ namespace awale
             System.Console.WriteLine(nombreGrainesTotalBase);
         }
 
-        public void faireAction (Trou trouDepart)
+        public void faireAction(Trou trouDepart)
         {
+            System.Console.WriteLine("/**** On effectue l'action ****/");
             //On récupére toutes les graines de la case de départ
             int graineEnMain = trouDepart.nombreGraines;
             trouDepart.nombreGraines = 0;
@@ -66,14 +67,14 @@ namespace awale
 
             getGraines(currentTrou);
         }
-        
+
         //Mis a jour du nombre de graines dans un trou
         public void updateElementList(Trou trouAUpdate)
         {
             for (int i = 0; i < this.trous.Count; i++)
             {
                 //Si c'est l'element qu'on cherche
-                if(this.trous.ElementAt(i).nom == trouAUpdate.nom)
+                if (this.trous.ElementAt(i).nom == trouAUpdate.nom)
                 {
                     //On modifie son nombre de graines
                     this.trous.ElementAt(i).nombreGraines = trouAUpdate.nombreGraines;
@@ -84,7 +85,7 @@ namespace awale
 
         public void getGraines(Trou trouATest)
         {
-            while(trouATest.nombreGraines == 2 || trouATest.nombreGraines == 3)
+            while (trouATest.nombreGraines == 2 || trouATest.nombreGraines == 3)
             {
                 this.currentJoueur.score += trouATest.nombreGraines;
                 trouATest.nombreGraines = 0;
@@ -103,11 +104,12 @@ namespace awale
                 nbGrainesEnJeu += trou.nombreGraines;
             }
 
-            if(this.nombreGrainesTotalBase / 2 > nbGrainesEnJeu)
+            if (this.nombreGrainesTotalBase / 2 > nbGrainesEnJeu)
             {
                 return true;
             }
-            else{
+            else
+            {
                 return false;
             }
         }
@@ -126,6 +128,43 @@ namespace awale
             //Si on arrive ici c'est que l'utilisateur ne possede pas le trou
             //il ne peut donc pas jouer
             return false;
+        }
+
+        public Trou meilleureActionIA()
+        {
+            System.Console.WriteLine("/**** Choix de la meilleure action pour l'IA ****/");
+
+            //On sauvegarde l'etat avant les modifications de l'IA
+            //pour pouvoir remettre en état aprés chaque test
+            ObservableCollection<Trou> saveTrous = this.trous;
+            Personne current = this.currentJoueur;
+            //Tchatcheur ;)
+            Trou bestTrou = null;
+            int bestScore = this.currentJoueur.score;
+
+            //On mise en priorité le score
+            foreach (var trou in this.currentJoueur.listTrouPerso)
+            {
+                if(trou.nombreGraines > 0)
+                {
+                    faireAction(trou);
+                    if (bestTrou == null)
+                    {
+                        bestTrou = trou;
+                    }
+                    else
+                    {
+                        //Si on gagne le plus de points depuis se trou on le joue
+                        if (bestScore < this.currentJoueur.score)
+                        {
+                            bestTrou = trou;
+                        }
+                    }
+                    this.trous = saveTrous;
+                    this.currentJoueur = current;
+                }
+            }
+            return bestTrou;
         }
     }
 }

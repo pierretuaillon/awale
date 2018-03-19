@@ -50,6 +50,13 @@ namespace awale
             this.score = 0;
         }
 
+        public Personne(string nom, int score)
+        {
+            this._nom = nom;
+            this.listTrouPerso = new List<Trou>();
+            this.score = score;
+        }
+
 
 
         public event PropertyChangedEventHandler PropertyChanged;

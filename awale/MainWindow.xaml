@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:awale"
         mc:Ignorable="d"
         Title="AWALE" Height="350" Width="525">
+    
     <Grid>
+        <Frame x:Name="mainFrame"/>
         <DockPanel>
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_Partie">
@@ -17,8 +19,8 @@
                     <MenuItem Header="_Exit" />
                 </MenuItem>
                 <MenuItem Header="_Historiques">
-                    <MenuItem Header="Toutes les parties" />
-                    Header="Parties gagnées" />
+                    <MenuItem Header="Toutes les parties" Click="AllPartie" />
+                    <MenuItem Header="Parties gagnées" />
                     <MenuItem Header="Parties perdus" />
                 </MenuItem>
                 

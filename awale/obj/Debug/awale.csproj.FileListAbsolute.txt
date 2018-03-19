@@ -13,3 +13,5 @@ D:\Projet net\awale\awale\obj\Debug\awale.csproj.GenerateResource.Cache
 D:\Projet net\awale\awale\obj\Debug\awale.csproj.CoreCompileInputs.cache
 D:\Projet net\awale\awale\obj\Debug\awale.exe
 D:\Projet net\awale\awale\obj\Debug\awale.pdb
+D:\Projet net\awale\awale\obj\Debug\PageHistorique.g.cs
+D:\Projet net\awale\awale\obj\Debug\PageHistorique.baml
