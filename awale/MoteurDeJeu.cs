@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using System.Windows;
 
 namespace awale
 {
@@ -96,7 +97,7 @@ namespace awale
         }
 
 
-        public Boolean actionPossible(Trou trouAtester)
+        /*public Boolean actionPossible(Trou trouAtester)
         {
             for (int i = 0; i < this.currentJoueur.listTrouPerso.Count; i++)
             {
@@ -110,51 +111,49 @@ namespace awale
             //Si on arrive ici c'est que l'utilisateur ne possede pas le trou
             //il ne peut donc pas jouer
             return false;
-        }
+        }*/
 
         public Trou meilleureActionIA()
         {
             System.Console.WriteLine("/**** Choix de la meilleure action pour l'IA ****/");
-
-            //On sauvegarde l'etat avant les modifications de l'IA
-            //pour pouvoir remettre en état aprés chaque test
-            //ObservableCollection<Trou> saveTrous = new ObservableCollection<Trou>(this.trous);
-            //Personne current = new Personne(this.currentJoueur);
+            
             Trou bestTrou = null;
-            //int bestScore = this.currentJoueur.score;
-
-            //On mise en priorité le score
+            Trou lePlusRempli = null;
+            //pour chacun de ses trous
             foreach (var trou in this.currentJoueur.listTrouPerso)
             {
                 if(trou.nombreGraines > 0)
                 {
-                    //faireAction(trou);
-                    if (bestTrou == null)
+                    //on regarde le trou dans lequel la derniere graine tombe
+                    Trou troufinal = trou;
+                    int nb = trou.nombreGraines;
+                    while (nb > 0) {
+                        troufinal = troufinal.successeur;
+                        nb--;
+                    }
+                    //si il contient déjà 1 ou 2 graine
+                    if(troufinal.nombreGraines==1 || troufinal.nombreGraines==2)
                     {
+                        //on garde ce coup
                         bestTrou = trou;
-                        //bestScore = this.currentJoueur.score;
                     }
+
+                    if (lePlusRempli == null)
+                        lePlusRempli = trou;
                     else
-                    {
-                        //Si on gagne le plus de points depuis se trou on le joue
-                        //if (bestScore < this.currentJoueur.score)
-                        Trou troufinal = trou;
-                        int nb = trou.nombreGraines;
-                        while (nb > 0) {
-                            troufinal = troufinal.successeur;
-                            nb--;
-                        }
-                        if(troufinal.nombreGraines==2 || troufinal.nombreGraines==3)
-                        {
-                            bestTrou = trou;
-                            //bestScore = this.currentJoueur.score;
-                        }
-                    }
-                    //this.trous = new ObservableCollection<Trou>(saveTrous);
-                    //this.currentJoueur = new Personne(current);
+                    //si il n'y a pas de bon coup on joue le dernier trou le plus rempli
+                    if (trou.nombreGraines > lePlusRempli.nombreGraines)
+                        lePlusRempli = trou;
                 }
             }
-            return bestTrou;
+            if(bestTrou != null)
+                return bestTrou;
+            return lePlusRempli;
+        }
+
+        internal void faireActionRecue(object trouRecu)
+        {
+            MessageBox.Show("TROU RECU : "+trouRecu);
         }
     }
 }

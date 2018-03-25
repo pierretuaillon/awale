@@ -10,19 +10,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace awale
 {
     /// <summary>
-    /// Logique d'interaction pour Page1.xaml
+    /// Logique d'interaction pour HistoriqueWindow.xaml
     /// </summary>
-    public partial class Page1 : Page
+    public partial class HistoriqueWindow : Window
     {
         public Historique historique { get; set; }
 
-        public Page1()
+        public HistoriqueWindow()
         {
             this.historique = new Historique("./res.csv");
             InitializeComponent();
@@ -34,7 +33,7 @@ namespace awale
 
             for (int i = 0; i < AllPlayer.Count; i++)
             {
-                if(i%2 == 0)
+                if (i % 2 == 0)
                 {
                     joueur1.Add(AllPlayer.ElementAt(i));
                 }
@@ -56,7 +55,8 @@ namespace awale
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            this.NavigationService.GoBack();
+            Close();
         }
     }
 }
+

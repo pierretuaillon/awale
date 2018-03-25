@@ -14,6 +14,11 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
+using System.Net.Sockets;
+using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace awale
 {
@@ -44,20 +49,24 @@ namespace awale
                     PropertyChanged(this, new PropertyChangedEventArgs("trous"));
             }
         }
-
-        
            
         public Personne joueur1 { get; set; }
         public Personne joueur2 { get; set; }
-
+        private List<TextBox> myTrous;
+        
         MoteurDeJeu moteur { get; set; }
+
+        private Socket socket;
+        private System.Net.Sockets.TcpClient clientSocket;
+        private BinaryFormatter binFormatter = new BinaryFormatter();
+
         public MainWindow()
         {
             this.historique = new Historique("./res.csv");
-            initializeList();
+            //initializeList();
             InitializeComponent();      
             this.DataContext = this;
-            rendreInvisible();
+            //rendreInvisible();
         }
 
         
@@ -81,7 +90,7 @@ namespace awale
             Trou troue = new Trou("e", 4, troud);
             Trou trouf = new Trou("f", 4, troue);
 
-            //Definition du predecesseur manquan
+            //Definition du predecesseur manquant
             trouA.predecesseur = trouf;
         
             //Definition des successeur
@@ -145,39 +154,34 @@ namespace awale
                     elementRecherche = this.trous.ElementAt(i);
                 }
             }
-
             
-            if (this.moteur.actionPossible(elementRecherche))
+            if (elementRecherche.nombreGraines > 0)
             {
-                if (elementRecherche.nombreGraines > 0)
-                {
-                    this.moteur.faireAction(elementRecherche);
+                this.moteur.faireAction(elementRecherche);
 
-                    //On modifie le joueur courant
-                    updateCurrentJoueur();
+                System.Console.WriteLine("/**** MISE A JOUR DE LA VUE ****/");
+                this.trous = this.moteur.trous;
 
-                    labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
-                }
-                else
-                {
-                    labelInformation.Text = "Vous ne pouvez pas jouer une case vide";
-                }
-                    
+                //On modifie le joueur courant
+                updateCurrentJoueur();
+
+                // si online envoi du trou joué
+                if (moteur.typeDepartie == "online")
+                    envoyerMsg(elementRecherche.nom);
+                
             }
             else
             {
-                labelInformation.Text = "Vous ne pouvez utiliser les graines de l'adversaire ! ";
+                labelInformation.Text = "Vous ne pouvez pas jouer une case vide";
             }
                 
 
-            System.Console.WriteLine("/**** MISE A JOUR DE LA VUE ****/");
-            this.trous = this.moteur.trous;
-
-            System.Console.WriteLine("/**** Contenue des trous ****/");
+            /*
+            System.Console.WriteLine("*** Contenu des trous ***");
             foreach (var trou in this.trous)
             {
                 System.Console.WriteLine(trou.nombreGraines);
-            }
+            }*/
 
             if (finPartie())
             {
@@ -222,11 +226,6 @@ namespace awale
             }*/
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            System.Console.WriteLine("/**** Click sur un element du menu Partie ****/");
-
-        }
 
 
         public void rendreInvisible()
@@ -279,20 +278,32 @@ namespace awale
             score2.Visibility = Visibility.Visible;
         }
 
-        public void joueursLocal(object sender, RoutedEventArgs e)
+        public void joueursLocal(object sender, RoutedEventArgs ev)
         {
             System.Console.WriteLine("/**** Click sur 2 joueurs local ****/");
-            rendreVisible();
             initializeList();
+            rendreVisible();
             this.moteur.typeDepartie = "local";
             labelInformation.Text = this.moteur.currentJoueur.nom + " commence";
+            a.IsEnabled = false;
+            b.IsEnabled = false;
+            c.IsEnabled = false;
+            d.IsEnabled = false;
+            e.IsEnabled = false;
+            f.IsEnabled = false;
+            A.IsEnabled = true;
+            B.IsEnabled = true;
+            C.IsEnabled = true;
+            D.IsEnabled = true;
+            E.IsEnabled = true;
+            F.IsEnabled = true;
         }
 
         public void joueurIA(object sender, RoutedEventArgs eventarg)
         {
             System.Console.WriteLine("/**** Click sur joueur IA ****/");
-            rendreVisible();
             initializeList();
+            rendreVisible();
             this.moteur.typeDepartie = "IA";
             labelInformation.Text = this.moteur.currentJoueur.nom + " commence";
             a.IsEnabled = false;
@@ -303,9 +314,137 @@ namespace awale
             f.IsEnabled = false;
         }
 
+        private void hebergerPartie(object sender, RoutedEventArgs ev)
+        {
+            System.Console.WriteLine("/**** Click sur heberger ****/");
+            initializeList();
+            rendreVisible();
+            this.moteur.typeDepartie = "online";
+            moteur.currentJoueur = joueur2;
+            a.IsEnabled = false;
+            b.IsEnabled = false;
+            c.IsEnabled = false;
+            d.IsEnabled = false;
+            e.IsEnabled = false;
+            f.IsEnabled = false;
+            myTrous = new List<TextBox>();
+            myTrous.Add(A);
+            myTrous.Add(B);
+            myTrous.Add(C);
+            myTrous.Add(D);
+            myTrous.Add(E);
+            myTrous.Add(F);
+
+            foreach (TextBox trou in myTrous)
+            {
+                trou.IsEnabled = false;
+            }
+
+            //connexion
+            TcpListener serverSocket = new TcpListener(2323);
+            clientSocket = default(TcpClient);
+            serverSocket.Start();
+            Console.WriteLine(" >> Server Started");
+            labelInformation.Text = "En attente de connexion ...";
+            clientSocket = serverSocket.AcceptTcpClient();
+            Console.WriteLine(" >> Accept connection from client");
+            MessageBox.Show("Connecté");
+            labelInformation.Text = this.moteur.currentJoueur.nom + " commence";
+
+            //attente du coup du joueur distant
+            lireMsgAsync();
+        }
+
+        private void rejoindrePartie(object sender, RoutedEventArgs ev)
+        {
+            System.Console.WriteLine("/**** Click sur rejoindre ****/");
+            var dialog = new Recherche_Joueur();
+            string adress = null;
+            if (dialog.ShowDialog() == true)
+            {
+                adress = dialog.ResponseText;
+                System.Console.WriteLine("* texte entré : " + adress + " *");
+            }
+            if (adress != null && Regex.IsMatch(adress, @"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$"))
+            {
+                System.Console.WriteLine("* IP entrée OK *");
+
+                initializeList();
+                rendreVisible();
+                this.moteur.typeDepartie = "online";
+                moteur.currentJoueur = joueur2;
+                clientSocket = new TcpClient();
+                clientSocket.Connect(adress, 2323);
+                MessageBox.Show("Connecté");
+                socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+                labelInformation.Text = this.moteur.currentJoueur.nom + " commence";
+                A.IsEnabled = false;
+                B.IsEnabled = false;
+                C.IsEnabled = false;
+                D.IsEnabled = false;
+                E.IsEnabled = false;
+                F.IsEnabled = false;
+                myTrous = new List<TextBox>();
+                myTrous.Add(a);
+                myTrous.Add(b);
+                myTrous.Add(c);
+                myTrous.Add(d);
+                myTrous.Add(e);
+                myTrous.Add(f);
+
+                foreach (TextBox trou in myTrous)
+                {
+                    trou.IsEnabled = true;
+                }
+                moteur.currentJoueur = joueur2;
+            }
+        }
+
+        private async void lireMsgAsync()
+        {
+            //récupération du message
+            NetworkStream networkStream = clientSocket.GetStream();
+            byte[] bytesFrom = new byte[10025];
+            try
+            {
+                await networkStream.ReadAsync(bytesFrom, 0, 10025);
+            }
+            catch
+            {
+                MessageBox.Show("Déconnecté");
+                return;
+            }
+            string dataFromClient = System.Text.Encoding.ASCII.GetString(bytesFrom);
+            dataFromClient = dataFromClient.Substring(0, dataFromClient.IndexOf("$"));
+            Console.WriteLine(" >> Message recu : " + dataFromClient);
+
+            //action du joueur distant
+            foreach (Trou trou in trous)
+            {
+                if (trou.nom == dataFromClient)
+                    moteur.faireAction(trou);
+            }
+
+            System.Console.WriteLine("/**** MISE A JOUR DE LA VUE ****/");
+            this.trous = this.moteur.trous;
+
+            updateCurrentJoueur();
+        }
+        
+
+        private void envoyerMsg(string trou)
+        {
+            System.Console.WriteLine(" >> Envoi du msg : "+trou);
+            NetworkStream stream = clientSocket.GetStream();
+            byte[] outStream = System.Text.Encoding.ASCII.GetBytes(trou + "$");
+            stream.Write(outStream, 0, outStream.Length);
+            stream.Flush();
+            lireMsgAsync();            
+        }
+
         private void updateCurrentJoueur()
         {
-            System.Console.WriteLine("/**** Mise à jour du joueur courant ****/");
+            System.Console.WriteLine("/**** Mise à jour du joueur courant : "+moteur.currentJoueur.nom);
             //Si le joueur courrant est le joueur 1
             if (this.moteur.currentJoueur.nom == this.joueur1.nom)
             {
@@ -320,19 +459,63 @@ namespace awale
                 PropertyChanged(this, new PropertyChangedEventArgs("joueur2"));
                 this.moteur.currentJoueur = this.joueur1;
             }
+
+            if (this.moteur.typeDepartie == "local")
+            {
+                if(this.joueur2.nom == this.moteur.currentJoueur.nom)
+                {
+                    a.IsEnabled = true;
+                    b.IsEnabled = true;
+                    c.IsEnabled = true;
+                    d.IsEnabled = true;
+                    e.IsEnabled = true;
+                    f.IsEnabled = true;
+                    A.IsEnabled = false;
+                    B.IsEnabled = false;
+                    C.IsEnabled = false;
+                    D.IsEnabled = false;
+                    E.IsEnabled = false;
+                    F.IsEnabled = false;
+                }
+                else
+                {
+                    a.IsEnabled = false;
+                    b.IsEnabled = false;
+                    c.IsEnabled = false;
+                    d.IsEnabled = false;
+                    e.IsEnabled = false;
+                    f.IsEnabled = false;
+                    A.IsEnabled = true;
+                    B.IsEnabled = true;
+                    C.IsEnabled = true;
+                    D.IsEnabled = true;
+                    E.IsEnabled = true;
+                    F.IsEnabled = true;
+                }
+
+            }
             //Si c'est ensuite au tour du joueur 2 en vs ia
-            if(this.moteur.typeDepartie == "IA" && this.joueur2.nom == this.moteur.currentJoueur.nom)
+            if (this.moteur.typeDepartie == "IA" && this.joueur2.nom == this.moteur.currentJoueur.nom)
             {
                 Trou bestChoix = this.moteur.meilleureActionIA();
                 this.moteur.faireAction(bestChoix);
                 PropertyChanged(this, new PropertyChangedEventArgs("joueur2"));
                 this.moteur.currentJoueur = this.joueur1;
             }
+            if (this.moteur.typeDepartie == "online")
+            {
+                foreach(TextBox trou in myTrous)
+                {
+                    trou.IsEnabled = !trou.IsEnabled;
+                }
+            }
+            System.Console.WriteLine("/**** Mise à jour du joueur - maj : " + moteur.currentJoueur.nom);
+            labelInformation.Text = "Au tour du joueur : " + this.moteur.currentJoueur.nom;
         }
 
         private void AllPartie(object sender, RoutedEventArgs e)
         {
-            this.Content = new Page1();
+            new HistoriqueWindow().Show();
         }
     }
 }
